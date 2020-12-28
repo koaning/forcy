@@ -2,5 +2,5 @@
 
 # forcy
 
-Force Directed Layout for spaCy doc-objects. It's similar to displacy 
-but it's a bit more customisable.
+This small project contains support for force directed layout visualisations
+for spaCy doc-objects. It's similar to displacy but it's more interactive.
