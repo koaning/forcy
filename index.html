@@ -1,7 +1,21 @@
-var width = $width,
-	height = $height;
+<style>.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
+  fill: white;
+}
 
-var svg = d3.select("#$div_id").append("svg").style("width", width).style("height", height);
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+}
+
+text {
+  font-family: sans-serif;
+  font-size: 14px;
+}</style><script src="https://d3js.org/d3.v4.min.js"></script><script src="//d3js.org/d3-scale-chromatic.v0.3.min.js"></script><div id='rando72433f34'></div><script>var width = 700,
+	height = 450;
+
+var svg = d3.select("#rando72433f34").append("svg").style("width", width).style("height", height);
 
 var color = d3.scaleOrdinal(d3.schemePastel1);
 
@@ -10,7 +24,7 @@ var simulation = d3.forceSimulation()
     .force("charge", d3.forceManyBody().strength(-150))
     .force("center", d3.forceCenter(width / 2, height / 2));
 
-var graph = $data;
+var graph = {'nodes': [{'id': '0', 'name': 'Give', 'pos': 'VERB', 'group': 'VERB'}, {'id': '5', 'name': 'me', 'pos': 'PRON', 'group': 'PRON'}, {'id': '8', 'name': 'a', 'pos': 'DET', 'group': 'DET'}, {'id': '10', 'name': 'recipe', 'pos': 'NOUN', 'group': 'NOUN'}, {'id': '16', 'name': '.', 'pos': 'PUNCT', 'group': 'PUNCT'}], 'links': [{'source': '0', 'target': '5', 'value': 1}, {'source': '0', 'target': '10', 'value': 1}, {'source': '0', 'target': '16', 'value': 1}, {'source': '10', 'target': '8', 'value': 1}]};
 
 var link = svg.append("g")
   .attr("class", "link")
@@ -78,3 +92,4 @@ function dragended(d) {
   d.fx = null;
   d.fy = null;
 }
+</script>
