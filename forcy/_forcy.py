@@ -1,9 +1,14 @@
-import matplotlib.pyplot as plt
+import json
+import random
+import pathlib
+from string import Template
+
 import networkx as nx
+import matplotlib.pyplot as plt
+from spacy.tokens import Token
+from IPython.core.display import HTML
 from networkx.drawing.nx_pydot import graphviz_layout
 from networkx.algorithms.simple_paths import all_simple_paths, all_simple_edge_paths
-
-from spacy.tokens import Token, Doc
 
 
 class Forcy:
@@ -36,6 +41,9 @@ class Forcy:
         """
         return {"pos": tok.pos_, "text": tok.text, "lemma": tok.lemma_, "lower": tok.lower_, "like_num": tok.like_num}
 
+    def _random_string(self):
+        return "".join([random.choice("qwertyuiopasdfghjklzxcvbnm") for _ in range(4)])
+
     def pretty_plot_coordinates(self, prog="dot"):
         """
         Generated coordinates for pretty visualisation.
@@ -44,6 +52,32 @@ class Forcy:
             - prog: the layout program from graphviz, can be either `dot`,`twopi`,`fdp`,`sfdp`
         """
         return graphviz_layout(self.graph, prog=prog)
+
+    def _d3_coordinates(self, prog="dot"):
+        """
+        Generated coordinates for pretty visualisation.
+
+        Arguments:
+            - prog: the layout program from graphviz, can be either `dot`,`twopi`,`fdp`,`sfdp`
+        """
+        node_data = []
+        for k, v in self.pretty_plot_coordinates(prog=prog).items():
+            d = {'coords': {"x": v[0], "y": v[1]}, 'idx': k, 'text': self.graph.nodes[k]['text'], 'pos': self.graph.nodes[k]['pos']}
+            node_data.append(d)
+        link_data = [{'source': node_data[s]['coords'], 'target': node_data[t]['coords'], **self.graph.edges[(s, t)]}
+                     for s, t in self.graph.edges]
+        return {"nodes": node_data, "links": link_data}
+
+    def d3_plot(self, prog="dot"):
+        """
+        Generate a d3 plot for jupyterlab.
+
+        Arguments:
+            - prog: the layout program from graphviz, can be either `dot`,`twopi`,`fdp`,`sfdp`
+        """
+        t = Template(pathlib.Path("_index.html").read_text())
+        rendered = t.substitute({'data': json.dumps(self._d3_coordinates(prog=prog)), 'tmpid': self._random_string()})
+        return HTML(rendered)
 
     def plot_mpl(self, prog="dot"):
         """
@@ -69,7 +103,7 @@ class Forcy:
         if self.text_appears_many_times(end):
             raise ValueError(f"Cannot use shorthand {end} because it appears multiple times in doc.")
         source, sink = self.idx_translation[start], self.idx_translation[end]
-        node_names = [doc[n] for n in next(all_simple_paths(self.graph, source, sink))]
+        node_names = [self.doc[n] for n in next(all_simple_paths(self.graph, source, sink))]
         edge_names = [self.graph.edges[(i, j)]['dep'] for i, j in next(all_simple_edge_paths(self.graph, source, sink))]
         fin_doc = node_names[-1]
         return "".join(f"{d}|{d.pos_} -[{e}]-> " for d, e in zip(node_names, edge_names)) + f"{fin_doc}|{fin_doc.pos_}"

@@ -9,7 +9,7 @@ That's only part of "why the name" though. The main goal here is that this
 might also help you "for see" patterns for a dependency matcher. 
 
 
-API: 
+## Usage: 
 
 ```python
 import spacy 
