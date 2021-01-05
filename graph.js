@@ -6,7 +6,7 @@ var svg = d3.select("#$div_id").append("svg").style("width", width).style("heigh
 var color = d3.scaleOrdinal(d3.schemePastel1);
 
 var simulation = d3.forceSimulation()
-    .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(70))
+    .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(30))
     .force("charge", d3.forceManyBody().strength(-150))
     .force("center", d3.forceCenter(width / 2, height / 2));
 
@@ -17,7 +17,22 @@ var link = svg.append("g")
   .selectAll("line")
   .data(graph.links)
   .enter().append("line")
-  .attr("stroke-width", function(d) { return 3; });
+  .attr("stroke-width", function(d) { return 3; })
+  .attr('marker-end','url(#arrowhead)');
+
+svg.append('defs').append('marker')
+    .attr("id",'arrowhead')
+    .attr('viewBox','-0 -5 10 10') //the bound of the SVG viewport for the current SVG fragment. defines a coordinate system 10 wide and 10 high starting on (0,-5)
+	.attr('refX', 20 - 2.5) // x coordinate for the reference point of the marker. If circle is bigger, this need to be bigger.
+	.attr('refY',0)
+	.attr('orient','auto')
+	.attr('markerWidth',6)
+	.attr('markerHeight',6)
+	.attr('xoverflow','visible')
+    .append('svg:path')
+    .attr('d', 'M 0,-2.5 L 5 ,0 L 0,2.5')
+    .attr('fill', '#999')
+    .style('stroke','none');
 
 var node = svg.append("g")
   .attr("class", "nodes")
@@ -27,7 +42,7 @@ var node = svg.append("g")
   .append("g");
 
 var circles = node.append("circle")
-  .attr("r", 20)
+  .attr("r", 15)
   .attr("fill", function(d) { return color(d.group); })
   .attr("stroke", function(d) { return d3.color(color(d.group)).darker(); })
   .attr("stroke-width", 2)
@@ -43,10 +58,7 @@ var labels = node.append("text")
   .attr("text-anchor", "middle")
   .attr("dy", ".35em");
 
-node.append("title").text(function(d) { return d.name; });
-
 simulation.nodes(graph.nodes).on("tick", ticked);
-
 simulation.force("link").links(graph.links);
 
 function ticked() {
@@ -66,6 +78,7 @@ function dragstarted(d) {
   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
   d.fx = d.x;
   d.fy = d.y;
+  d3.select(this).classed("fixed", d.fixed = true);
 }
 
 function dragged(d) {

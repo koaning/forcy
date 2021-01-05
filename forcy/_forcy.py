@@ -1,10 +1,9 @@
 import matplotlib.pyplot as plt
 import networkx as nx
-import pydot
 from networkx.drawing.nx_pydot import graphviz_layout
 from networkx.algorithms.simple_paths import all_simple_paths, all_simple_edge_paths
 
-from spacy.tokens import Token
+from spacy.tokens import Token, Doc
 
 
 class Forcy:
